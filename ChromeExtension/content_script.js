@@ -5,7 +5,7 @@
 $(function () {
   //给页面增加一个固定定位的按钮
   let fixedStr='<div style="position: fixed;bottom:50px;right:60px;height:50px;z-index:10000;" class="fixedButton">' +
-  '<input type="text" id="playListId" placeholder="输入歌单id" /><button id="getListInfo" style="width:80px;height:25px;font-size:10px;">获取</button></div>'
+  '<input type="text" id="playListId" placeholder="输入歌单id" /><button id="getListInfo" style="width:80px;height:25px;font-size:10px;">下载歌单</button><button id="getSongInfo" style="width:80px;height:25px;font-size:10px;">获取歌曲</button></div>'
   $('body').append(fixedStr)
   // 分析请求必须的js
   // 点击获取按钮
@@ -14,6 +14,10 @@ $(function () {
     eve.emit('encryptStart', id)
   })
 
+  $('#getSongInfo').click(function () {
+    let id = $('#playListId').val()
+    eve.emit('getSingleSongStart', id)
+  })
   // 接口请求分析
   // detail接口: {"id":"5101959860","offset":"0","total":"true","limit":"1000","n":"1000","csrf_token":"abbd0ab5e81a88e5a04c331e54817710"}
   // 下载歌曲
@@ -61,6 +65,7 @@ $(function () {
   // getGlobalWindow()
   // 全局监听加密完成事件
   eve.on('encryptFinished', readyToQuest)
+  eve.on('getSingleSongFinished', singleSongReadyToQuest)
   function readyToQuest (data) {
     let url = 'https://music.163.com/weapi/v6/playlist/detail?csrf_token='
     url += window.crsfToken
@@ -72,7 +77,23 @@ $(function () {
     axios.post(url, newQuery)
     .then(function (res) {
       let tracks = res.data.playlist.tracks
-      downMusic(tracks)
+      // downMusic(tracks)
+    })
+    .catch(function (err) {
+      console.log(err)
+    })
+  }
+  function singleSongReadyToQuest (data) {
+    let url = 'https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token='
+    url += window.crsfToken
+    let query = {
+      params: data.encText,
+      encSecKey: data.encSecKey
+    }
+    let newQuery = Qs.stringify(query)
+    axios.post(url, newQuery)
+    .then(function (res) {
+      console.log(res)
     })
     .catch(function (err) {
       console.log(err)

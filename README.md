@@ -10,6 +10,12 @@
 # 最好: 手机上将歌单歌曲全选，创建新歌单，刷新电脑，粘贴新歌单id能获取完整歌曲列表
 ```
 
+#### 单音质提升
+1. 利用 `weapi/song/enhance/player` 接口
+```JS
+// "{"ids":"[1439291691]","level":"standard","encodeType":"aac","csrf_token":"6a49321dc4ef4bfec200e3c855acbad8"}"
+```
+
 
 
 #### 参考
