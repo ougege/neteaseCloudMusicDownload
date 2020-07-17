@@ -47614,6 +47614,7 @@ function singleCsrfToken (id) {
     var c4g = NEJ.P
     var v5A = c4g("nej.j")
     window.crsfToken = v5A.gP7I("__csrf")
+    // window.crsfToken = '78ce218366db1a14b90323bdbafd62c'
     window.songId = id
     // 模拟云音乐加密
     singleSongEncrypt()
@@ -47628,14 +47629,25 @@ function fakeEncrypt () {
     eve.emit('encryptFinished', result)
 }
 function singleSongEncrypt () {
-    // 注意：键值对必须都用双引号包裹
-    let d = '{"ids":"[' + window.songId + ']","level":"standard","encodeType":"aac","csrf_token":"' + window.crsfToken + '"}'
+    // 注意：键值对必须都用双引号包裹,encodeType = aac
+    // level: standard
+    let d = '{"ids":"[' + window.songId + ']","level":"standard","encodeType":"mp3","csrf_token":"' + window.crsfToken + '"}'
     console.log(d)
     let e = "010001"
     let f = "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7"
     let g = "0CoJUm6Qyw8W8jud"
     let result = fakeD(d, e, f, g)
     eve.emit('getSingleSongFinished', result)
+}
+// 163邮箱请求音乐接口
+function get163mailSongEncrypt () {
+    // 注意：键值对必须都用双引号包裹
+    let d = '{"id":"' + windown.songId + '","ids":"[' + window.songId + ']","csrf_token":"' + window.crsfToken + '"}'
+    let e = "010001"
+    let f = "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7"
+    let g = "0CoJUm6Qyw8W8jud"
+    let result = fakeD(d, e, f, g)
+    eve.emit('get163MailSongFinished', result)
 }
 function fakeD (d, e, f, g) {
     var h = {}

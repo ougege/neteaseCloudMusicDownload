@@ -5,7 +5,11 @@
 $(function () {
   //给页面增加一个固定定位的按钮
   let fixedStr='<div style="position: fixed;bottom:50px;right:60px;height:50px;z-index:10000;" class="fixedButton">' +
-  '<input type="text" id="playListId" placeholder="输入歌单id" /><button id="getListInfo" style="width:80px;height:25px;font-size:10px;">下载歌单</button><button id="getSongInfo" style="width:80px;height:25px;font-size:10px;">获取歌曲</button></div>'
+  '<input type="text" id="playListId" placeholder="输入歌单id" />'+
+  '<button id="getListInfo" style="width:80px;height:25px;font-size:10px;">下载歌单</button>'+
+  '<button id="getSongInfo" style="width:80px;height:25px;font-size:10px;">获取歌曲</button>'+
+  '<button id="getLofterSong" style="width:80px;height:25px;font-size:10px;">lofter歌曲</button>'+
+  '</div>'
   $('body').append(fixedStr)
   // 分析请求必须的js
   // 点击获取按钮
@@ -13,10 +17,16 @@ $(function () {
     let id = $('#playListId').val()
     eve.emit('encryptStart', id)
   })
-
+  // 获取单曲歌曲信息
   $('#getSongInfo').click(function () {
     let id = $('#playListId').val()
     eve.emit('getSingleSongStart', id)
+  })
+  // lofter获取歌曲信息
+  // 获取单曲歌曲信息
+  $('#getLofterSong').click(function () {
+    let id = $('#playListId').val()
+    getMusicDetail(id)
   })
   // 接口请求分析
   // detail接口: {"id":"5101959860","offset":"0","total":"true","limit":"1000","n":"1000","csrf_token":"abbd0ab5e81a88e5a04c331e54817710"}
@@ -66,6 +76,7 @@ $(function () {
   // 全局监听加密完成事件
   eve.on('encryptFinished', readyToQuest)
   eve.on('getSingleSongFinished', singleSongReadyToQuest)
+  eve.on('get163MailSongFinished', mail163SongReadyToQuest)
   function readyToQuest (data) {
     let url = 'https://music.163.com/weapi/v6/playlist/detail?csrf_token='
     url += window.crsfToken
@@ -97,6 +108,50 @@ $(function () {
     })
     .catch(function (err) {
       console.log(err)
+    })
+  }
+  // 来自linux的破解
+  // function singleSongReadyToQuest (data) {
+  //   let url = 'https://music.163.com/api/linux/forward'
+  //   let query = {
+  //     eparams: '3134729CC09796CB31F2FFF45684A58FCFA972FA5EA3D6247CD6247C8198CB8748CD759EE9B12828BD745AC17A3E8E1422C3DEB43E0839C64C47C3B14364EAAAD0A222DF9CE9B1BE260F0A819B3EC93C2B9459ADCD79CC54CBDCA58519B2F637778034A856CB5852E39F71C9A52D2DB6BB06948ED0EA54B20A23110445000682'
+  //   }
+  //   let newQuery = Qs.stringify(query)
+  //   axios.post(url, newQuery)
+  //   .then(function (res) {
+  //     console.log(res)
+  //   })
+  //   .catch(function (err) {
+  //     console.log(err)
+  //   })
+  // }
+  // 163邮箱
+  function mail163SongReadyToQuest (data) {
+    let url = 'https://music.163.com/weapi/song/enhance/player/url?ref=mail&csrf_token='
+    url += window.crsfToken
+    let query = {
+      params: data.encText,
+      encSecKey: data.encSecKey
+    }
+    let newQuery = Qs.stringify(query)
+    axios.post(url, newQuery)
+    .then(function (res) {
+      console.log(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+    })
+  }
+  // 查询音乐详情接口
+  function getMusicDetail (id) {
+    let url = 'http://music.163.com/api/song/detail/?ids='
+    let ids = '[' + id + ']'
+    let href = url + ids
+    axios({
+      method:'get',
+      url: href,
+    }).then(function(res) {
+      console.log(res)
     })
   }
 })
