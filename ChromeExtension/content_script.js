@@ -77,6 +77,7 @@ $(function () {
   eve.on('encryptFinished', readyToQuest)
   eve.on('getSingleSongFinished', singleSongReadyToQuest)
   eve.on('get163MailSongFinished', mail163SongReadyToQuest)
+  // 获取歌曲列表
   function readyToQuest (data) {
     let url = 'https://music.163.com/weapi/v6/playlist/detail?csrf_token='
     url += window.crsfToken
@@ -87,44 +88,25 @@ $(function () {
     let newQuery = Qs.stringify(query)
     axios.post(url, newQuery)
     .then(function (res) {
-      let tracks = res.data.playlist.tracks
-      // 遍历，拿到mp3的真实地址
-      let audioArr = getRealAddress(tracks)
-
-      // downMusic(tracks)
+      window.audioList = res.data.playlist.tracks
+      let audioStr = getIdArrToStr(window.audioList)
+      eve.emit('getSingleSongStart', audioStr)
     })
     .catch(function (err) {
       console.log(err)
     })
   }
-  function getRealAddress (arr) {
-    let promiseArr = []
+  // 歌曲列表转id字符串
+  function getIdArrToStr (arr) {
+    let idArr = []
     if (arr.length > 0) {
       arr.forEach(item => {
-        let id = item.id
-        let p1 = new Promise(function (resolve, reject) {
-          let url = 'https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token='
-          url += window.crsfToken
-          let query = {
-            params: data.encText,
-            encSecKey: data.encSecKey
-          }
-          let newQuery = Qs.stringify(query)
-          axios.post(url, newQuery)
-          .then(function (res) {
-            resolve(res)
-          })
-          .catch(function (err) {
-            reject(err)
-          })
-        })
-        promiseArr.push(p1)
+        idArr.push(item.id)
       })
     }
-    Promise.all(promiseArr).then(function (res) {
-      console.log(res)
-    })
+    return idArr.join()
   }
+  // 获取歌曲详情
   function singleSongReadyToQuest (data) {
     let url = 'https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token='
     url += window.crsfToken
@@ -136,10 +118,38 @@ $(function () {
     axios.post(url, newQuery)
     .then(function (res) {
       console.log(res)
+      downloadAudioFromDetail(res.data.data)
     })
     .catch(function (err) {
       console.log(err)
     })
+  }
+  // 下载歌曲
+  function downloadAudioFromDetail (arr) {
+    if (arr.length > 0) {
+      arr.forEach(item => {
+        let href = item.url
+        let id = item.id
+        let name
+        window.audioList.forEach(li => {
+          if (id === li.id) {
+            name = li.name
+          }
+        })
+        // 由于同源策略，浏览器默认会预览文件，而不是下载，改用blob
+        axios({
+          method:'get',
+          url: href,
+          responseType: 'blob'
+        }).then(function(res) {
+          let aa = document.createElement('a')
+          let aHref = URL.createObjectURL(new Blob([res.data]))
+          aa.setAttribute('href', aHref)
+          aa.setAttribute('download', name + '.mp3')
+          aa.click()
+        })
+      })
+    }
   }
   // 来自linux的破解
   // function singleSongReadyToQuest (data) {
