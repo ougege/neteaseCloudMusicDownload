@@ -47630,9 +47630,10 @@ function fakeEncrypt () {
 }
 function singleSongEncrypt () {
     // 注意：键值对必须都用双引号包裹,encodeType = aac
-    // level: standard
-    let d = '{"ids":"[' + window.songId + ']","level":"standard","encodeType":"mp3","csrf_token":"' + window.crsfToken + '"}'
-    console.log(d)
+    // 参数来自于云音乐linux版接口
+    // level: standard, higher, exhigh,
+    // 无损type: flac
+    let d = '{"ids":"[' + window.songId + ']","level":"exhigh","encodeType":"mp3","csrf_token":"' + window.crsfToken + '"}'
     let e = "010001"
     let f = "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7"
     let g = "0CoJUm6Qyw8W8jud"

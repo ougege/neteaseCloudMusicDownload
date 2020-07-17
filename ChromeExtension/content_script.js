@@ -88,10 +88,41 @@ $(function () {
     axios.post(url, newQuery)
     .then(function (res) {
       let tracks = res.data.playlist.tracks
+      // 遍历，拿到mp3的真实地址
+      let audioArr = getRealAddress(tracks)
+
       // downMusic(tracks)
     })
     .catch(function (err) {
       console.log(err)
+    })
+  }
+  function getRealAddress (arr) {
+    let promiseArr = []
+    if (arr.length > 0) {
+      arr.forEach(item => {
+        let id = item.id
+        let p1 = new Promise(function (resolve, reject) {
+          let url = 'https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token='
+          url += window.crsfToken
+          let query = {
+            params: data.encText,
+            encSecKey: data.encSecKey
+          }
+          let newQuery = Qs.stringify(query)
+          axios.post(url, newQuery)
+          .then(function (res) {
+            resolve(res)
+          })
+          .catch(function (err) {
+            reject(err)
+          })
+        })
+        promiseArr.push(p1)
+      })
+    }
+    Promise.all(promiseArr).then(function (res) {
+      console.log(res)
     })
   }
   function singleSongReadyToQuest (data) {
