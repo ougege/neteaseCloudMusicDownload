@@ -47617,7 +47617,7 @@ function singleCsrfToken (id) {
     // window.crsfToken = '78ce218366db1a14b90323bdbafd62c'
     window.songId = id
     // 模拟云音乐加密
-    singleSongEncrypt()
+    return singleSongEncrypt()
 }
 function fakeEncrypt () {
     // 注意：键值对必须都用双引号包裹
@@ -47638,7 +47638,8 @@ function singleSongEncrypt () {
     let f = "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7"
     let g = "0CoJUm6Qyw8W8jud"
     let result = fakeD(d, e, f, g)
-    eve.emit('getSingleSongFinished', result)
+    return result
+    // eve.emit('getSingleSongFinished', result)
 }
 // 163邮箱请求音乐接口
 function get163mailSongEncrypt () {

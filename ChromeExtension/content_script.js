@@ -7,12 +7,12 @@ $(function () {
   let fixedStr='<div style="position: fixed;bottom:50px;right:60px;height:50px;z-index:10000;" class="fixedButton">' +
   '<input type="text" id="playListId" placeholder="输入歌单id" />'+
   '<button id="getListInfo" style="width:80px;height:25px;font-size:10px;">下载歌单</button>'+
-  '<button id="getSongInfo" style="width:80px;height:25px;font-size:10px;">获取歌曲</button>'+
-  '<button id="getLofterSong" style="width:80px;height:25px;font-size:10px;">lofter歌曲</button>'+
+  // '<button id="getSongInfo" style="width:80px;height:25px;font-size:10px;">获取歌曲</button>'+
+  // '<button id="getLofterSong" style="width:80px;height:25px;font-size:10px;">lofter歌曲</button>'+
   '</div>'
   $('body').append(fixedStr)
   // 分析请求必须的js
-  // 点击获取按钮
+  // 点击下载歌单
   $('#getListInfo').click(function () {
     let id = $('#playListId').val()
     eve.emit('encryptStart', id)
@@ -38,6 +38,27 @@ $(function () {
         // let idAndExtension = calCurrentBestQuality(item)
         let href = defaultUrl + item.id
         // 歌单详情:https://music.163.com/api/playlist/detail?id=2557908184 才20项
+        let name = item.name + '.mp3'
+        // 由于同源策略，浏览器默认会预览文件，而不是下载，改用blob
+        axios({
+          method:'get',
+          url: href,
+          responseType: 'blob'
+        }).then(function(res) {
+          let aa = document.createElement('a')
+          let aHref = URL.createObjectURL(new Blob([res.data]))
+          aa.setAttribute('href', aHref)
+          aa.setAttribute('download', name)
+          aa.click()
+        })
+      })
+    }
+  }
+  // 批量下载歌曲
+  function downMany (arr) {
+    if (arr.length > 0) {
+      arr.forEach(item => {
+        let href = item.url
         let name = item.name + '.mp3'
         // 由于同源策略，浏览器默认会预览文件，而不是下载，改用blob
         axios({
@@ -88,14 +109,72 @@ $(function () {
     let newQuery = Qs.stringify(query)
     axios.post(url, newQuery)
     .then(function (res) {
+<<<<<<< HEAD
+      let tracks = res.data.playlist.tracks
+      // 遍历，拿到mp3的真实地址
+      let audioArr = getRealAddress(tracks)
+      // downMusic(tracks)
+=======
       window.audioList = res.data.playlist.tracks
       let audioStr = getIdArrToStr(window.audioList)
       eve.emit('getSingleSongStart', audioStr)
+>>>>>>> master
     })
     .catch(function (err) {
       console.log(err)
     })
   }
+<<<<<<< HEAD
+  function getRealAddress (arr) {
+    let promiseArr = []
+    let nameArr = []
+    if (arr.length > 0) {
+      arr.forEach(item => {
+        let id = item.id
+        nameArr.push(item)
+        // eve.emit('getSingleSongStart', id)
+        let data = singleCsrfToken(id)
+        let p1 = new Promise(function (resolve, reject) {
+          let url = 'https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token='
+          url += window.crsfToken
+          let query = {
+            params: data.encText,
+            encSecKey: data.encSecKey
+          }
+          let newQuery = Qs.stringify(query)
+          axios.post(url, newQuery)
+          .then(function (res) {
+            resolve(res)
+          })
+          .catch(function (err) {
+            reject(err)
+          })
+        })
+        promiseArr.push(p1)
+      })
+    }
+    Promise.all(promiseArr).then(function (res) {
+      // 处理res成downMany需要的数组形式
+      let arr = []
+      if (res.length > 0) {
+        res.forEach(item => {
+          arr.push(item.data.data[0])
+        })
+      }
+      // 匹配歌曲名字
+      if (arr.length > 0) {
+        arr.forEach(item => {
+          nameArr.forEach(li => {
+            if (item.id == li.id) {
+              item.name = li.name
+            }
+          })
+        })
+      }
+      // 批量下载歌曲
+      downMany(arr)
+    })
+=======
   // 歌曲列表转id字符串
   function getIdArrToStr (arr) {
     let idArr = []
@@ -105,6 +184,7 @@ $(function () {
       })
     }
     return idArr.join()
+>>>>>>> master
   }
   // 获取歌曲详情
   function singleSongReadyToQuest (data) {
