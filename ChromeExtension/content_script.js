@@ -109,22 +109,15 @@ $(function () {
     let newQuery = Qs.stringify(query)
     axios.post(url, newQuery)
     .then(function (res) {
-<<<<<<< HEAD
       let tracks = res.data.playlist.tracks
       // 遍历，拿到mp3的真实地址
       let audioArr = getRealAddress(tracks)
       // downMusic(tracks)
-=======
-      window.audioList = res.data.playlist.tracks
-      let audioStr = getIdArrToStr(window.audioList)
-      eve.emit('getSingleSongStart', audioStr)
->>>>>>> master
     })
     .catch(function (err) {
       console.log(err)
     })
   }
-<<<<<<< HEAD
   function getRealAddress (arr) {
     let promiseArr = []
     let nameArr = []
@@ -174,17 +167,6 @@ $(function () {
       // 批量下载歌曲
       downMany(arr)
     })
-=======
-  // 歌曲列表转id字符串
-  function getIdArrToStr (arr) {
-    let idArr = []
-    if (arr.length > 0) {
-      arr.forEach(item => {
-        idArr.push(item.id)
-      })
-    }
-    return idArr.join()
->>>>>>> master
   }
   // 获取歌曲详情
   function singleSongReadyToQuest (data) {
